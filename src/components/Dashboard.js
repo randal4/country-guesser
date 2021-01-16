@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -19,17 +19,17 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "./listItems";
-import Deposits from "./Deposits";
 import StatsGrid from "./StatsGrid";
 import MapChart from "./MapChart";
+import CountryDetails from "./CountryDetails";
+import rawDataJson from "./data/countryData.json";
+import ReactTooltip from "react-tooltip";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
+      <Link color="inherit" href="https://material-ui.com/"></Link>{" "}
       {new Date().getFullYear()}
       {"."}
     </Typography>
@@ -60,8 +60,8 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
+    //marginLeft: drawerWidth,
+    //width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -119,16 +119,46 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Dashboard() {
   const classes = useStyles();
+  const [loading, setLoading] = React.useState(true);
   const [open, setOpen] = React.useState(true);
+  const [rawData, setRawData] = React.useState();
+  const [selectedCountryData, setSelectedCountryData] = React.useState();
+  const [tooltipContent, setTooltipContent] = React.useState("");
+
+  useEffect(() => {
+    //get the data
+    setRawData(rawDataJson);
+
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    rawData &&
+      setSelectedCountryData(
+        rawData.data.rows.find((data) => data.country === "World")
+      );
+  }, [rawData]);
+
+  const handleCountryClick = (geo) => {
+    setSelectedCountryData(
+      rawData.data.rows.find(
+        (country) => country.country_abbreviation === geo.ISO_A2
+      )
+    );
+  };
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
-  return (
+  return loading ? (
+    "Loading..."
+  ) : (
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
@@ -155,16 +185,16 @@ export default function Dashboard() {
             noWrap
             className={classes.title}
           >
-            Dashboard
+            Covid-19 Dashboard
           </Typography>
-          <IconButton color="inherit">
+          {/*<IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
             </Badge>
-          </IconButton>
+            </IconButton>*/}
         </Toolbar>
       </AppBar>
-      <Drawer
+      {/*<Drawer
         variant="permanent"
         classes={{
           paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
@@ -180,7 +210,7 @@ export default function Dashboard() {
         <List>{mainListItems}</List>
         <Divider />
         <List>{secondaryListItems}</List>
-      </Drawer>
+      </Drawer>*/}
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
@@ -190,20 +220,24 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 {/*<Chart />*/}
                 <div>
-                  <MapChart />
+                  <MapChart
+                    handleCountryClick={handleCountryClick}
+                    setTooltipContent={setTooltipContent}
+                  />
+                  <ReactTooltip>{tooltipContent}</ReactTooltip>
                 </div>
               </Paper>
             </Grid>
-            {/* Recent Deposits */}
+            {/* Country Details */}
             <Grid item xs={12} md={4} lg={3}>
               <Paper className={fixedHeightPaper}>
-                <Deposits />
+                <CountryDetails data={selectedCountryData} />
               </Paper>
             </Grid>
             {/* Stats */}
             <Grid item xs={12}>
               <Paper className={fixedHeightPaper}>
-                <StatsGrid />
+                <StatsGrid data={rawData} />
               </Paper>
             </Grid>
           </Grid>

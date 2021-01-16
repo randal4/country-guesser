@@ -20,7 +20,8 @@ const MapChart = (props) => {
   const [data, setData] = useState([]);
 
   const countryClicked = (geo) => (e) => {
-    console.log(geo);
+    console.log(e);
+    //e.target.style
     props.handleCountryClick(geo);
   };
 
@@ -31,6 +32,7 @@ const MapChart = (props) => {
 
   return (
     <ComposableMap
+      data-tip=""
       projectionConfig={{
         rotate: [-10, 0, 0],
         scale: 147,
@@ -54,6 +56,13 @@ const MapChart = (props) => {
                           ? colorScale(d.total_cases.replace(/,/g, ""))
                           : "#F5F4F6"
                       }
+                      onMouseEnter={() => {
+                        const { NAME } = geo.properties;
+                        props.setTooltipContent(`${NAME}`);
+                      }}
+                      onMouseLeave={() => {
+                        props.setTooltipContent("");
+                      }}
                       stroke={"black"}
                       strokeWidth={0.5}
                       style={{
