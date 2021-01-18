@@ -1,11 +1,7 @@
 import React from "react";
-import { Divider, Paper, Typography } from "@material-ui/core";
+import { Divider, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import DetailsStat from "./DetailsStat";
-
-function preventDefault(event) {
-  event.preventDefault();
-}
 
 const useStyles = makeStyles({
   detailsContext: {
@@ -42,7 +38,7 @@ export default function CountryDetails({ data }) {
         <img
           className={classes.flagImage}
           src={data.flag}
-          alt="{data.country} flag"
+          alt={`${data.country} flag`}
         ></img>{" "}
       </div>
       <Divider />
