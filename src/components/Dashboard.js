@@ -13,79 +13,28 @@ import Link from "@material-ui/core/Link";
 import StatsGrid from "./StatsGrid";
 import MapChart from "./MapChart";
 import CountryDetails from "./CountryDetails";
-import rawDataJson from "./data/countryData.json";
 import ReactTooltip from "react-tooltip";
+import axios from "axios";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/"></Link>{" "}
+      <Link color="inherit" href="https://material-ui.com/">
+        {" "}
+      </Link>{" "}
       {new Date().getFullYear()}
       {"."}
     </Typography>
   );
 }
 
-const drawerWidth = 240;
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    padding: "0 8px",
-    ...theme.mixins.toolbar,
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    //marginLeft: drawerWidth,
-    //width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: "none",
-  },
   title: {
     flexGrow: 1,
-  },
-  drawerPaper: {
-    position: "relative",
-    whiteSpace: "nowrap",
-    width: drawerWidth,
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: "hidden",
-    transition: theme.transitions.create("width", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9),
-    },
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
@@ -110,16 +59,23 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Dashboard() {
   const classes = useStyles();
+
   const [loading, setLoading] = React.useState(true);
   const [rawData, setRawData] = React.useState();
   const [selectedCountryData, setSelectedCountryData] = React.useState();
   const [tooltipContent, setTooltipContent] = React.useState("");
 
   useEffect(() => {
-    //get the data
-    setRawData(rawDataJson);
+    const fetchData = async () => {
+      const result = await axios(
+        "https://corona-virus-stats.herokuapp.com/api/v1/cases/countries-search?limit=220&page=1"
+      );
 
-    setLoading(false);
+      setRawData(result.data);
+      setLoading(false);
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -170,6 +126,8 @@ export default function Dashboard() {
                   <MapChart
                     handleCountryClick={handleCountryClick}
                     setTooltipContent={setTooltipContent}
+                    loading={loading}
+                    data={rawData.data.rows}
                   />
                   <ReactTooltip>{tooltipContent}</ReactTooltip>
                 </div>
@@ -184,7 +142,7 @@ export default function Dashboard() {
             {/* Stats */}
             <Grid item xs={12}>
               <Paper className={fixedHeightPaper}>
-                <StatsGrid data={rawData} />
+                <StatsGrid data={rawData.data} loading={loading} />
               </Paper>
             </Grid>
           </Grid>

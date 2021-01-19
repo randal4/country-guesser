@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { scaleThreshold } from "d3-scale";
 import { schemeBlues } from "d3-scale-chromatic";
 import {
@@ -7,7 +7,6 @@ import {
   Geography,
   ZoomableGroup,
 } from "react-simple-maps";
-import rawData from "./data/countryData.json";
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
@@ -17,20 +16,15 @@ const colorScale = scaleThreshold()
   .range(schemeBlues[8]);
 
 const MapChart = (props) => {
-  const [data, setData] = useState([]);
+  const { loading, data } = props;
 
   const countryClicked = (geo) => (e) => {
-    console.log(e);
-    //e.target.style
     props.handleCountryClick(geo);
   };
 
-  useEffect(() => {
-    console.log(rawData);
-    setData(rawData.data.rows);
-  }, []);
-
-  return (
+  return loading ? (
+    "Loading..."
+  ) : (
     <ComposableMap
       data-tip=""
       projectionConfig={{
@@ -74,10 +68,10 @@ const MapChart = (props) => {
                     />
                   );
                 } else {
-                  console.log(
+                  /*console.log(
                     "country not found in data list",
                     geo.properties.ISO_A2
-                  );
+                  );*/
                   return null;
                 }
               })
