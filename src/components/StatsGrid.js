@@ -1,6 +1,5 @@
 import React from "react";
 import { DataGrid } from "@material-ui/data-grid";
-//import rawData from "./data/countryData.json";
 
 export default function StatsGrid(props) {
   const { loading, data } = props;

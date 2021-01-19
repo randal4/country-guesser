@@ -4,9 +4,7 @@ import Title from "./Title";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
-  root: {
-    //margin: "15px 5px 15px 5px",
-  },
+  root: {},
 });
 
 export default function DetailsStat(props) {
