@@ -11,14 +11,19 @@ import {
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
-const colorScale = scaleThreshold()
-  .domain([100, 1000, 5000, 100000, 250000, 500000, 1000000])
-  .range(schemeBlues[8]);
+const calculateFill = (d) => {
+  if (!d) {
+    return "#ffffff";
+  } else {
+    return d.correct ? "#7fbd5b" : "#e6255b";
+  }
+};
 
 const MapChart = (props) => {
   const { loading, data } = props;
 
   const countryClicked = (geo) => (e) => {
+    e.preventDefault();
     props.handleCountryClick(geo);
   };
 
@@ -33,51 +38,30 @@ const MapChart = (props) => {
       }}
     >
       <ZoomableGroup>
-        {data.length > 0 && (
-          <Geographies geography={geoUrl}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                const d = data.find((s) => {
-                  return s.country_abbreviation === geo.properties.ISO_A2;
-                });
-                if (d) {
-                  return (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill={
-                        d
-                          ? colorScale(d.total_cases.replace(/,/g, ""))
-                          : "#F5F4F6"
-                      }
-                      onMouseEnter={() => {
-                        const { NAME } = geo.properties;
-                        props.setTooltipContent(`${NAME}`);
-                      }}
-                      onMouseLeave={() => {
-                        props.setTooltipContent("");
-                      }}
-                      stroke={"black"}
-                      strokeWidth={0.5}
-                      style={{
-                        default: { outline: "none" },
-                        hover: { outline: "none", strokeWidth: 1 },
-                        pressed: { outline: "none", strokeWidth: 1 },
-                      }}
-                      onClick={countryClicked(geo.properties)}
-                    />
-                  );
-                } else {
-                  /*console.log(
-                    "country not found in data list",
-                    geo.properties.ISO_A2
-                  );*/
-                  return null;
-                }
-              })
-            }
-          </Geographies>
-        )}
+        <Geographies geography={geoUrl}>
+          {({ geographies }) =>
+            geographies.map((geo) => {
+              const d = data.find((s) => {
+                return s.country === geo.properties.ISO_A2;
+              });
+              return (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill={calculateFill(d)}
+                  stroke={"black"}
+                  strokeWidth={0.5}
+                  style={{
+                    default: { outline: "none" },
+                    hover: { outline: "none", strokeWidth: 1 },
+                    pressed: { outline: "none", strokeWidth: 1 },
+                  }}
+                  onClick={countryClicked(geo.properties)}
+                />
+              );
+            })
+          }
+        </Geographies>
       </ZoomableGroup>
     </ComposableMap>
   );

@@ -1,33 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Box from "@material-ui/core/Box";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import Link from "@material-ui/core/Link";
-import StatsGrid from "./StatsGrid";
 import MapChart from "./MapChart";
-import CountryDetails from "./CountryDetails";
-import ReactTooltip from "react-tooltip";
-import axios from "axios";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        {" "}
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import Guess from "./Guess";
+import RecentGuesses from "./RecentGuesses";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -55,42 +35,87 @@ const useStyles = makeStyles((theme) => ({
   fixedHeight: {
     height: 640,
   },
+  guessHeight: {
+    height: 100,
+    marginBottom: 30,
+    padding: 10,
+  },
 }));
 
 export default function Dashboard() {
   const classes = useStyles();
 
   const [loading, setLoading] = React.useState(true);
-  const [rawData, setRawData] = React.useState();
   const [selectedCountryData, setSelectedCountryData] = React.useState();
-  const [tooltipContent, setTooltipContent] = React.useState("");
+  const [guessedCountries, setGuessedCountries] = React.useState([
+    { country: "US", correct: true },
+    { country: "CA", correct: false },
+  ]);
+  const [countryGuessText, setCountryGuessText] = useState("");
+  const [recentGuessList, setRecentGuessList] = useState([]);
+
+  const handleSubmit = () => {
+    //e.preventDefault();
+    handleGuess(countryGuessText);
+    setCountryGuessText("");
+  };
+
+  const handleKeydown = (event) => {
+    const { key, keyCode } = event;
+    if (!selectedCountryData) return;
+    if (keyCode === 8) {
+      setCountryGuessText((countryGuessText) =>
+        countryGuessText.substr(0, countryGuessText.length - 1)
+      );
+    }
+    if (keyCode === 13) {
+      handleSubmit();
+    }
+    if (countryGuessText.length === selectedCountryData.NAME.length) {
+      return;
+    }
+    if ((keyCode >= 65 && keyCode <= 90) || keyCode === 32) {
+      event.preventDefault();
+      setCountryGuessText((countryGuessText) => countryGuessText + key);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await axios(
-        "https://corona-virus-stats.herokuapp.com/api/v1/cases/countries-search?limit=220&page=1"
-      );
+    window.addEventListener("keydown", handleKeydown);
 
-      setRawData(result.data);
-      setLoading(false);
-    };
+    return () => window.removeEventListener("keydown", handleKeydown);
+  }, [handleKeydown]);
 
-    fetchData();
+  useEffect(() => {
+    setLoading(false);
   }, []);
 
-  useEffect(() => {
-    rawData &&
-      setSelectedCountryData(
-        rawData.data.rows.find((data) => data.country === "World")
-      );
-  }, [rawData]);
-
-  const handleCountryClick = (geo) => {
-    setSelectedCountryData(
-      rawData.data.rows.find(
-        (country) => country.country_abbreviation === geo.ISO_A2
-      )
+  const handleCountryClick = (geoProps) => {
+    const alreadyGuessed = guessedCountries.find(
+      (s) => s.country === geoProps.ISO_A2
     );
+
+    if (!alreadyGuessed) {
+      setCountryGuessText("");
+      setSelectedCountryData(geoProps);
+    }
+  };
+
+  const handleGuess = (guessedCountry) => {
+    setGuessedCountries([
+      ...guessedCountries,
+      {
+        country: selectedCountryData.ISO_A2,
+        correct:
+          guessedCountry.toUpperCase() ===
+          selectedCountryData.NAME.toUpperCase(),
+      },
+    ]);
+    setRecentGuessList([
+      { attempted: guessedCountry, correct: selectedCountryData.NAME },
+      ...recentGuessList,
+    ]);
+    setSelectedCountryData(null);
   };
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
@@ -100,7 +125,7 @@ export default function Dashboard() {
   ) : (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="absolute" className={classes.appBar}>
+      {/*<AppBar position="absolute" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Typography
             component="h1"
@@ -109,46 +134,46 @@ export default function Dashboard() {
             noWrap
             className={classes.title}
           >
-            Covid-19 Dashboard
+            Guess the Country
           </Typography>
         </Toolbar>
-      </AppBar>
+  </AppBar>*/}
 
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
+        {/*<div className={classes.appBarSpacer} />*/}
         <Container maxWidth="lg" className={classes.container}>
+          {/* Country Details */}
+          <Grid item xs={12} spacing={3}>
+            <Paper className={classes.guessHeight}>
+              <Guess
+                data={selectedCountryData}
+                currentGuess={countryGuessText}
+              />
+            </Paper>
+          </Grid>
           <Grid container spacing={3}>
             {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
+            <Grid item xs={12} md={8}>
               <Paper className={fixedHeightPaper}>
                 {/*<Chart />*/}
                 <div>
                   <MapChart
                     handleCountryClick={handleCountryClick}
-                    setTooltipContent={setTooltipContent}
                     loading={loading}
-                    data={rawData.data.rows}
+                    data={guessedCountries}
                   />
-                  <ReactTooltip>{tooltipContent}</ReactTooltip>
+                  {/* <ReactTooltip> </ReactTooltip> */}
                 </div>
               </Paper>
             </Grid>
-            {/* Country Details */}
-            <Grid item xs={12} md={4} lg={3}>
+
+            {/* Score */}
+            <Grid item xs={12} md={4}>
               <Paper className={fixedHeightPaper}>
-                <CountryDetails data={selectedCountryData} />
-              </Paper>
-            </Grid>
-            {/* Stats */}
-            <Grid item xs={12}>
-              <Paper className={fixedHeightPaper}>
-                <StatsGrid data={rawData.data} loading={loading} />
+                <RecentGuesses recentGuessList={recentGuessList} />
               </Paper>
             </Grid>
           </Grid>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
         </Container>
       </main>
     </div>
