@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -8,6 +8,7 @@ import Paper from "@material-ui/core/Paper";
 import MapChart from "./MapChart";
 import Guess from "./Guess";
 import RecentGuesses from "./RecentGuesses";
+import geoData from "./data/geoData.json";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,55 +52,9 @@ export default function Dashboard() {
     { country: "US", correct: true },
     { country: "CA", correct: false },
   ]);
+  const [guessNumber, setGuessNumber] = React.useState(1);
   const [countryGuessText, setCountryGuessText] = useState("");
   const [recentGuessList, setRecentGuessList] = useState([]);
-
-  const handleSubmit = () => {
-    //e.preventDefault();
-    handleGuess(countryGuessText);
-    setCountryGuessText("");
-  };
-
-  const handleKeydown = (event) => {
-    const { key, keyCode } = event;
-    if (!selectedCountryData) return;
-    if (keyCode === 8) {
-      setCountryGuessText((countryGuessText) =>
-        countryGuessText.substr(0, countryGuessText.length - 1)
-      );
-    }
-    if (keyCode === 13) {
-      handleSubmit();
-    }
-    if (countryGuessText.length === selectedCountryData.NAME.length) {
-      return;
-    }
-    if ((keyCode >= 65 && keyCode <= 90) || keyCode === 32) {
-      event.preventDefault();
-      setCountryGuessText((countryGuessText) => countryGuessText + key);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeydown);
-
-    return () => window.removeEventListener("keydown", handleKeydown);
-  }, [handleKeydown]);
-
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  const handleCountryClick = (geoProps) => {
-    const alreadyGuessed = guessedCountries.find(
-      (s) => s.country === geoProps.ISO_A2
-    );
-
-    if (!alreadyGuessed) {
-      setCountryGuessText("");
-      setSelectedCountryData(geoProps);
-    }
-  };
 
   const handleGuess = (guessedCountry) => {
     setGuessedCountries([
@@ -112,10 +67,87 @@ export default function Dashboard() {
       },
     ]);
     setRecentGuessList([
-      { attempted: guessedCountry, correct: selectedCountryData.NAME },
+      {
+        attempted: guessedCountry,
+        correct: selectedCountryData.NAME,
+        guessNumber: guessNumber,
+      },
       ...recentGuessList,
     ]);
-    setSelectedCountryData(null);
+    setSelectedCountryData(getRandomUnguessedCountry());
+    setGuessNumber(guessNumber + 1);
+  };
+
+  const getRandomUnguessedCountry = () => {
+    const min = 0;
+    const max = geoData.objects.ne_110m_admin_0_countries.geometries.length - 1;
+
+    while (true) {
+      const randomCountryNumber = Math.floor(min + Math.random() * (max - min));
+      const randomCountryData =
+        geoData.objects.ne_110m_admin_0_countries.geometries[
+          randomCountryNumber
+        ].properties;
+
+      const alreadyGuessedCountry = guessedCountries.find(
+        (alreadyGuessedCountry) => {
+          return randomCountryData.ISO_A2 === alreadyGuessedCountry.country;
+        }
+      );
+
+      if (!alreadyGuessedCountry) {
+        return randomCountryData;
+      }
+    }
+  };
+
+  const handleKeydown = useCallback(
+    (event) => {
+      const { key, keyCode } = event;
+      if (!selectedCountryData) return;
+      if (keyCode === 8) {
+        setCountryGuessText((countryGuessText) =>
+          countryGuessText.substr(0, countryGuessText.length - 1)
+        );
+      }
+      if (keyCode === 13) {
+        handleGuess(countryGuessText);
+        setCountryGuessText("");
+      }
+      if (countryGuessText.length === selectedCountryData.NAME.length) {
+        return;
+      }
+      if ((keyCode >= 65 && keyCode <= 90) || keyCode === 32) {
+        event.preventDefault();
+        setCountryGuessText((countryGuessText) => countryGuessText + key);
+      }
+    },
+    [countryGuessText, handleGuess, selectedCountryData]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => window.removeEventListener("keydown", handleKeydown);
+  }, [handleKeydown]);
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    setSelectedCountryData(getRandomUnguessedCountry());
+  }, []);
+
+  const handleCountryClick = (geoProps) => {
+    const alreadyGuessed = guessedCountries.find(
+      (s) => s.country === geoProps.ISO_A2
+    );
+
+    if (!alreadyGuessed) {
+      setCountryGuessText("");
+      setSelectedCountryData(geoProps);
+    }
   };
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
@@ -143,7 +175,7 @@ export default function Dashboard() {
         {/*<div className={classes.appBarSpacer} />*/}
         <Container maxWidth="lg" className={classes.container}>
           {/* Country Details */}
-          <Grid item xs={12} spacing={3}>
+          <Grid item xs={12}>
             <Paper className={classes.guessHeight}>
               <Guess
                 data={selectedCountryData}
@@ -158,7 +190,9 @@ export default function Dashboard() {
                 {/*<Chart />*/}
                 <div>
                   <MapChart
+                    geoData={geoData}
                     handleCountryClick={handleCountryClick}
+                    selectedCountryIsoA2={selectedCountryData?.ISO_A2}
                     loading={loading}
                     data={guessedCountries}
                   />

@@ -1,6 +1,4 @@
 import React from "react";
-import { scaleThreshold } from "d3-scale";
-import { schemeBlues } from "d3-scale-chromatic";
 import {
   ComposableMap,
   Geographies,
@@ -8,11 +6,13 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 
-const geoUrl =
-  "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
+//const geoUrl =
+//"https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
 
-const calculateFill = (d) => {
-  if (!d) {
+const calculateFill = (d, geo, selectedCountryIsoA2) => {
+  if (selectedCountryIsoA2 === geo.properties.ISO_A2) {
+    return "#f2e127";
+  } else if (!d) {
     return "#ffffff";
   } else {
     return d.correct ? "#7fbd5b" : "#e6255b";
@@ -20,7 +20,7 @@ const calculateFill = (d) => {
 };
 
 const MapChart = (props) => {
-  const { loading, data } = props;
+  const { loading, data, selectedCountryIsoA2, geoData } = props;
 
   const countryClicked = (geo) => (e) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ const MapChart = (props) => {
       }}
     >
       <ZoomableGroup>
-        <Geographies geography={geoUrl}>
+        <Geographies geography={geoData}>
           {({ geographies }) =>
             geographies.map((geo) => {
               const d = data.find((s) => {
@@ -48,9 +48,11 @@ const MapChart = (props) => {
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  fill={calculateFill(d)}
+                  fill={calculateFill(d, geo, selectedCountryIsoA2)}
                   stroke={"black"}
-                  strokeWidth={0.5}
+                  strokeWidth={
+                    selectedCountryIsoA2 === geo.properties.ISO_A2 ? 1.5 : 0.5
+                  }
                   style={{
                     default: { outline: "none" },
                     hover: { outline: "none", strokeWidth: 1 },
