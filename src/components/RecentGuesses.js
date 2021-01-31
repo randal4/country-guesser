@@ -19,18 +19,18 @@ export default function RecentGuesses({ recentGuessList }) {
               key={guess.guessNumber}
             >
               <Box
-                my={3}
+                mb={3}
                 p={3}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   border: "2px solid black",
-                  borderRadius: "20px",
+                  borderRadius: "10px",
                   backgroundColor:
                     guess.attempted.toUpperCase() ===
                     guess.correct.toUpperCase()
-                      ? "#7fbd5b"
-                      : "#e6255b",
+                      ? "#A9CF54"
+                      : "#F1433F",
                 }}
               >
                 {guess.attempted.toUpperCase() ===
@@ -40,8 +40,18 @@ export default function RecentGuesses({ recentGuessList }) {
                   <ClearIcon />
                 )}
                 <Box mx={3}>
-                  <Typography>Attempted: {guess.attempted}</Typography>
-                  <Typography>Correct: {guess.correct}</Typography>
+                  <Box>
+                    <Typography display="inline">Attempted: </Typography>
+                    <Typography variant="h6" display="inline">
+                      {guess.attempted}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography display="inline">Correct: </Typography>
+                    <Typography variant="h6" display="inline">
+                      {guess.correct}
+                    </Typography>
+                  </Box>
                 </Box>
                 <Divider />
               </Box>

@@ -11,11 +11,11 @@ import {
 
 const calculateFill = (d, geo, selectedCountryIsoA2) => {
   if (selectedCountryIsoA2 === geo.properties.ISO_A2) {
-    return "#f2e127";
+    return "#F7E967";
   } else if (!d) {
     return "#ffffff";
   } else {
-    return d.correct ? "#7fbd5b" : "#e6255b";
+    return d.correct ? "#A9CF54" : "#F1433F";
   }
 };
 
