@@ -20,6 +20,7 @@ import RecentGuesses from "./RecentGuesses";
 import geoData from "./data/geoData.json";
 import Scorebar from "./Scorebar";
 import ReactTooltip from "react-tooltip";
+import ResetConfirmModal from "./ResetConfirmModal";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard() {
   const classes = useStyles();
 
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [tooltipContent, setTooltipContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedCountryData, setSelectedCountryData] = useLocalStorage(
@@ -77,6 +79,19 @@ export default function Dashboard() {
     "recentGuessList",
     []
   );
+
+  const openResetDialog = () => {
+    setResetDialogOpen(true);
+  };
+
+  const handleResetDialogCancel = () => {
+    setResetDialogOpen(false);
+  };
+
+  const handleResetGame = () => {
+    resetGame();
+    setResetDialogOpen(false);
+  };
 
   const resetGame = () => {
     setGuessedCountries([]);
@@ -219,13 +234,19 @@ export default function Dashboard() {
             noWrap
             className={classes.title}
           >
-            Guess the Country
+            Geography Time!
           </Typography>
-          <IconButton onClick={resetGame}>
-            <CachedIcon />
+          <IconButton onClick={openResetDialog}>
+            <CachedIcon style={{ color: "white" }} />
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      <ResetConfirmModal
+        open={resetDialogOpen}
+        handleCancel={handleResetDialogCancel}
+        handleReset={handleResetGame}
+      />
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
