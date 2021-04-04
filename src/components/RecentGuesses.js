@@ -8,6 +8,12 @@ import "./RecentGuesses.css";
 export default function RecentGuesses({ recentGuessList }) {
   return (
     <div>
+      <div style={{ marginBottom: "1em" }}>
+        <Typography variant="h5" backgroundColor="">
+          Recent Guesses
+        </Typography>
+      </div>
+
       <TransitionGroup className="todo-list">
         {recentGuessList.map((guess) => {
           return (

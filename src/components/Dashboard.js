@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     height: "60vh",
   },
   guessHeight: {
-    height: "20vh",
+    height: "auto",
     marginBottom: 30,
     padding: 10,
   },
