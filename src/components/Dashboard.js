@@ -1,14 +1,25 @@
 import React, { useEffect, useState, useCallback } from "react";
+import useLocalStorage from "../hooks/useLocalStorage";
 import clsx from "clsx";
+import PublicIcon from "@material-ui/icons/Public";
+import CachedIcon from "@material-ui/icons/Cached";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
-import { Grid, Paper, AppBar, Toolbar, Typography } from "@material-ui/core";
+import {
+  Grid,
+  Paper,
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+} from "@material-ui/core";
 import MapChart from "./MapChart";
 import Guess from "./Guess";
 import RecentGuesses from "./RecentGuesses";
 import geoData from "./data/geoData.json";
 import Scorebar from "./Scorebar";
+import ReactTooltip from "react-tooltip";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,10 +46,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   fixedHeight: {
-    height: 640,
+    height: "60vh",
   },
   guessHeight: {
-    height: 200,
+    height: "20vh",
     marginBottom: 30,
     padding: 10,
   },
@@ -47,12 +58,33 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard() {
   const classes = useStyles();
 
-  const [loading, setLoading] = React.useState(true);
-  const [selectedCountryData, setSelectedCountryData] = React.useState();
-  const [guessedCountries, setGuessedCountries] = React.useState([]);
-  const [guessNumber, setGuessNumber] = React.useState(1);
-  const [countryGuessText, setCountryGuessText] = useState("");
-  const [recentGuessList, setRecentGuessList] = useState([]);
+  const [tooltipContent, setTooltipContent] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [selectedCountryData, setSelectedCountryData] = useLocalStorage(
+    "selectedCountryData",
+    {}
+  );
+  const [guessedCountries, setGuessedCountries] = useLocalStorage(
+    "guessedCountries",
+    []
+  );
+  const [guessNumber, setGuessNumber] = useLocalStorage("guessNumber", 1);
+  const [countryGuessText, setCountryGuessText] = useLocalStorage(
+    "countryGuessText",
+    ""
+  );
+  const [recentGuessList, setRecentGuessList] = useLocalStorage(
+    "recentGuessList",
+    []
+  );
+
+  const resetGame = () => {
+    setGuessedCountries([]);
+    setGuessNumber(1);
+    setCountryGuessText("");
+    setRecentGuessList([]);
+    setSelectedCountryData(getRandomUnguessedCountry());
+  };
 
   const getRandomUnguessedCountry = useCallback(() => {
     const min = 0;
@@ -131,7 +163,13 @@ export default function Dashboard() {
         return;
       }
       // Normal alpha keys and space
-      if ((keyCode >= 65 && keyCode <= 90) || keyCode === 32) {
+      if (
+        (keyCode >= 65 && keyCode <= 90) ||
+        keyCode === 32 ||
+        keyCode === 189 ||
+        keyCode === 222 ||
+        keyCode === 190
+      ) {
         event.preventDefault();
         setCountryGuessText((countryGuessText) => countryGuessText + key);
       }
@@ -173,6 +211,7 @@ export default function Dashboard() {
       <CssBaseline />
       <AppBar position="absolute" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
+          <PublicIcon style={{ marginRight: "1em" }} />
           <Typography
             component="h1"
             variant="h6"
@@ -182,6 +221,9 @@ export default function Dashboard() {
           >
             Guess the Country
           </Typography>
+          <IconButton onClick={resetGame}>
+            <CachedIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -201,19 +243,18 @@ export default function Dashboard() {
           <Grid container spacing={3}>
             {/* Chart */}
             <Grid item xs={12} md={8}>
-              <Paper className={fixedHeightPaper}>
+              <Paper className={fixedHeightPaper} style={{ padding: "0" }}>
                 {/*<Chart />*/}
-                <div>
-                  <MapChart
-                    geoData={geoData}
-                    handleCountryClick={handleCountryClick}
-                    selectedCountryIsoA2={selectedCountryData?.ISO_A2}
-                    loading={loading}
-                    data={guessedCountries}
-                  />
-                  {/* <ReactTooltip> </ReactTooltip> */}
-                </div>
+                <MapChart
+                  geoData={geoData}
+                  handleCountryClick={handleCountryClick}
+                  selectedCountryIsoA2={selectedCountryData?.ISO_A2}
+                  loading={loading}
+                  data={guessedCountries}
+                  setTooltipContent={setTooltipContent}
+                />
               </Paper>
+              <ReactTooltip>{tooltipContent}</ReactTooltip>
             </Grid>
 
             {/* Score */}

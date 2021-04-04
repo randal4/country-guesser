@@ -20,7 +20,7 @@ export default function RecentGuesses({ recentGuessList }) {
             >
               <Box
                 mb={3}
-                p={3}
+                p={1}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -39,7 +39,7 @@ export default function RecentGuesses({ recentGuessList }) {
                 ) : (
                   <ClearIcon />
                 )}
-                <Box mx={3}>
+                <Box mx={2}>
                   <Box>
                     <Typography display="inline">Attempted: </Typography>
                     <Typography variant="h6" display="inline">

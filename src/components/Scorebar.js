@@ -54,10 +54,6 @@ export default function Scorebar({ guessedCountries, totalNumberOfCountries }) {
     return guess.correct === false;
   }).length;
 
-  const guessedWrongPercentage = Math.floor(
-    (wrongGuessedCountries / guessedCountries.length) * 100
-  );
-
   const totalGuesses = correctGuessedCountries + wrongGuessedCountries;
 
   return guessedCountries ? (

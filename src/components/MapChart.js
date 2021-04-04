@@ -20,7 +20,13 @@ const calculateFill = (d, geo, selectedCountryIsoA2) => {
 };
 
 const MapChart = (props) => {
-  const { loading, data, selectedCountryIsoA2, geoData } = props;
+  const {
+    loading,
+    data,
+    selectedCountryIsoA2,
+    geoData,
+    setTooltipContent,
+  } = props;
 
   const countryClicked = (geo) => (e) => {
     e.preventDefault();
@@ -34,7 +40,7 @@ const MapChart = (props) => {
       data-tip=""
       projectionConfig={{
         rotate: [-10, 0, 0],
-        scale: 147,
+        scale: 220,
       }}
     >
       <ZoomableGroup>
@@ -59,6 +65,15 @@ const MapChart = (props) => {
                     pressed: { outline: "none", strokeWidth: 1 },
                   }}
                   onClick={countryClicked(geo.properties)}
+                  onMouseEnter={() => {
+                    const { NAME } = geo.properties;
+                    if (d) {
+                      setTooltipContent(`${NAME}`);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    setTooltipContent("");
+                  }}
                 />
               );
             })
