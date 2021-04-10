@@ -47,7 +47,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   fixedHeight: {
-    height: "60vh",
+    height: "auto",
+    maxHeight: "55vh",
   },
   guessHeight: {
     height: "auto",
@@ -221,6 +222,8 @@ export default function Dashboard() {
       setCountryGuessText("");
       setSelectedCountryData(geoProps);
     }
+
+    document.querySelector("#guessText").focus();
   };
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
@@ -284,7 +287,7 @@ export default function Dashboard() {
               <ReactTooltip>{tooltipContent}</ReactTooltip>
             </Grid>
 
-            {/* Score */}
+            {/* Guesses */}
             <Grid item xs={12} md={4}>
               <Paper className={fixedHeightPaper}>
                 <RecentGuesses recentGuessList={recentGuessList} />

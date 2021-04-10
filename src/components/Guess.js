@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, FormControl, Input } from "@material-ui/core";
+import { Typography, FormControl } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
   },
   guessTextBox: {
     border: "0px",
-    fontSize: "3vw",
+    fontSize: "4vw",
     minWidth: "100%",
     letterSpacing: ".5em",
     color: theme.palette.primary.main,
