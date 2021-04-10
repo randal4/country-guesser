@@ -82,6 +82,7 @@ export default function Dashboard() {
 
   const openResetDialog = () => {
     setResetDialogOpen(true);
+    document.querySelector("#guessText").focus();
   };
 
   const handleResetDialogCancel = () => {
@@ -155,6 +156,11 @@ export default function Dashboard() {
       guessedCountries,
       recentGuessList,
       selectedCountryData,
+      setCountryGuessText,
+      setGuessNumber,
+      setGuessedCountries,
+      setRecentGuessList,
+      setSelectedCountryData,
     ]
   );
 
@@ -189,7 +195,7 @@ export default function Dashboard() {
         setCountryGuessText((countryGuessText) => countryGuessText + key);
       }
     },
-    [countryGuessText, handleGuess, selectedCountryData]
+    [countryGuessText, handleGuess, selectedCountryData, setCountryGuessText]
   );
 
   useEffect(() => {

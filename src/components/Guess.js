@@ -1,16 +1,24 @@
 import React from "react";
-import { Typography } from "@material-ui/core";
+import { Typography, FormControl, Input } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles({
-  guessTextBox: {
+const useStyles = makeStyles((theme) => ({
+  guessWrapper: {
     display: "flex",
-    flex: 1,
     flexGrow: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "center",
   },
-});
+  guessTextBox: {
+    border: "0px",
+    fontSize: "3vw",
+    minWidth: "100%",
+    letterSpacing: ".5em",
+    color: theme.palette.primary.main,
+    spellcheck: false,
+    caretColor: "transparent",
+    textAlign: "center",
+  },
+}));
 
 export default function Guess({ data, currentGuess }) {
   const classes = useStyles();
@@ -19,16 +27,21 @@ export default function Guess({ data, currentGuess }) {
   console.log("data.NAME.length", data.NAME.length);
   console.log("currentGuess.length", currentGuess.length);
 
+  const handleOnClick = () => {};
+
   return data ? (
-    <div className={classes.guessTextBox}>
-      <Typography
-        variant="h3"
-        align="center"
-        color="primary"
-        style={{ letterSpacing: ".4em" }}
-      >
-        {currentGuess + "_".repeat(data.NAME.length - currentGuess.length)}
-      </Typography>
+    <div className={classes.guessWrapper} onClick={handleOnClick}>
+      <FormControl style={{ width: "100%" }}>
+        <input
+          type="text-area"
+          spellcheck="false"
+          id="guessText"
+          className={classes.guessTextBox}
+          value={
+            currentGuess + "_".repeat(data.NAME.length - currentGuess.length)
+          }
+        />
+      </FormControl>
     </div>
   ) : (
     <Typography variant="h3" align="center" color="primary">
