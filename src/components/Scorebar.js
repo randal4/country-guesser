@@ -1,14 +1,14 @@
-import React from "react";
-import { Box, Typography, LinearProgress } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import React from 'react';
+import { Box, Typography, LinearProgress } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   guessTextBox: {
-    display: "flex",
+    display: 'flex',
     flex: 1,
     flexGrow: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
 });
 
@@ -61,14 +61,14 @@ export default function Scorebar({ guessedCountries, totalNumberOfCountries }) {
       <div className={classes.guessTextBox}>
         <LinearProgressWithLabel
           value={(correctGuessedCountries / totalGuesses) * 100}
-          label={correctGuessedCountries + "/" + totalGuesses}
+          label={correctGuessedCountries + '/' + totalGuesses}
           typeLabel="Guess %"
         />
       </div>
       <div className={classes.guessTextBox}>
         <LinearProgressWithLabel
           value={guessedCorrectPercentage}
-          label={correctGuessedCountries + "/" + totalNumberOfCountries}
+          label={correctGuessedCountries + '/' + totalNumberOfCountries}
           typeLabel="Total Progress"
         />
       </div>

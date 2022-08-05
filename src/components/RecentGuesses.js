@@ -1,20 +1,19 @@
-import React from "react";
-import { Box, Typography, Divider } from "@material-ui/core";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import ClearIcon from "@material-ui/icons/Clear";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
-import "./RecentGuesses.css";
+import React from 'react';
+import { Box, Typography, Divider } from '@material-ui/core';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import ClearIcon from '@material-ui/icons/Clear';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import './RecentGuesses.css';
 
 export default function RecentGuesses({ recentGuessList }) {
   return (
     <div>
-      <div style={{ marginBottom: "1em" }}>
-        <Typography variant="h5" backgroundColor="">
-          Recent Guesses
-        </Typography>
+      <div style={{ marginBottom: '1em' }}>
+        <Typography variant="h5">Recent Guesses</Typography>
+        <hr />
       </div>
 
-      <TransitionGroup className="todo-list">
+      <TransitionGroup>
         {recentGuessList.map((guess) => {
           return (
             <CSSTransition
@@ -28,15 +27,15 @@ export default function RecentGuesses({ recentGuessList }) {
                 mb={3}
                 p={1}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  border: "2px solid black",
-                  borderRadius: "10px",
+                  display: 'flex',
+                  alignItems: 'center',
+                  border: '2px solid black',
+                  borderRadius: '5px',
                   backgroundColor:
                     guess.attempted.toUpperCase() ===
                     guess.correct.toUpperCase()
-                      ? "#A9CF54"
-                      : "#F1433F",
+                      ? '#A9CF54'
+                      : '#F1433F',
                 }}
               >
                 {guess.attempted.toUpperCase() ===
